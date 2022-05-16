@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import contactsActions from 'redux/contacts/contacts-actions';
-
+import { getContacts } from 'redux/contacts/contacts-selector';
 import PropTypes from 'prop-types';
 import s from './ContactForm.module.css';
 
 const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const contacts = useSelector(getContacts);
   const dispatch = useDispatch();
 
   const handleChange = e => {
@@ -30,13 +31,21 @@ const ContactForm = () => {
   const handleSubmit = e => {
     e.preventDefault();
 
-    if (name !== '' && number !== '') {
-      dispatch(contactsActions.addContact(name, number));
-      resetForm();
-      return;
+    if (name === '' || number === '') {
+      return alert('Fill in name and number.');
     }
 
-    alert('Заполни имя и номер.');
+    if (
+      contacts.some(
+        contact => contact.name.toLowerCase() === name.toLowerCase()
+      )
+    ) {
+      resetForm();
+      return alert(`${name} is already in contacts.`);
+    }
+
+    dispatch(contactsActions.addContact(name, number));
+    resetForm();
   };
 
   const resetForm = () => {
