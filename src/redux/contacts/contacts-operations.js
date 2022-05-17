@@ -1,42 +1,59 @@
-import axios from 'axios';
-import {
-  fetchContactRequest,
-  fetchContactSuccess,
-  fetchContactError,
-  addContactRequest,
-  addContactSuccess,
-  addContactError,
-  deleteContactRequest,
-  deleteContactSuccess,
-  deleteContactError,
-} from './contacts-actions';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import * as contactsAPI from 'services/contacts-api';
 
-axios.defaults.baseURL = 'http://localhost:4040';
+export const fetchContacts = createAsyncThunk(
+  'contacts/fetchContacts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const contacts = await contactsAPI.fetchContacts();
+      return contacts;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
-const fetchContacts = () => dispatch => {
-  dispatch(fetchContactRequest());
-  axios
-    .get('/contacts')
-    .then(({ data }) => dispatch(fetchContactSuccess(data)))
-    .catch(error => dispatch(fetchContactError(error)));
-};
+export const addContact = createAsyncThunk(
+  'contacts/addContacts',
+  async ({ name, number }) => {
+    const contact = await contactsAPI.addContact({ name, number });
+    return contact;
+  }
+);
 
-const addContact = (name, number) => dispatch => {
-  const contact = { name, number };
-  dispatch(addContactRequest());
-  axios
-    .post('/contacts', contact)
-    .then(({ data }) => dispatch(addContactSuccess(data)))
-    .catch(error => dispatch(addContactError(error)));
-};
+export const deleteContact = createAsyncThunk(
+  'contacts/deleteContact',
+  async (contactId, { rejectWithValue }) => {
+    try {
+      const { id } = await contactsAPI.deleteContact(contactId);
+      return id;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
-const deleteContact = id => dispatch => {
-  dispatch(deleteContactRequest());
-  axios
-    .delete(`/contacts/${id}`)
-    .then(() => dispatch(deleteContactSuccess(id)))
-    .catch(error => dispatch(deleteContactError(error)));
-};
+// const fetchContacts = () => dispatch => {
+//   dispatch(fetchContactRequest());
+//   axios
+//     .get('/contacts')
+//     .then(({ data }) => dispatch(fetchContactSuccess(data)))
+//     .catch(error => dispatch(fetchContactError(error)));
+// };
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default { fetchContacts, addContact, deleteContact };
+// export const addContact = (name, number) => dispatch => {
+//   const contact = { name, number };
+//   dispatch(addContactRequest());
+//   axios
+//     .post('/contacts', contact)
+//     .then(({ data }) => dispatch(addContactSuccess(data)))
+//     .catch(error => dispatch(addContactError(error)));
+// };
+
+// export const deleteContact = id => dispatch => {
+//   dispatch(deleteContactRequest());
+//   axios
+//     .delete(`/contacts/${id}`)
+//     .then(() => dispatch(deleteContactSuccess(id)))
+//     .catch(error => dispatch(deleteContactError(error)));
+// };

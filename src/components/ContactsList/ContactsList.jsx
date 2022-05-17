@@ -1,6 +1,9 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import contactsOperations from 'redux/contacts/contacts-operations';
+import {
+  fetchContacts,
+  deleteContact,
+} from 'redux/contacts/contacts-operations';
 import {
   getLoading,
   getVisibleContacts,
@@ -14,27 +17,29 @@ const ContactsList = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(contactsOperations.fetchContacts());
-  }, []);
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   return (
     <>
       {isLoadig && <Loader />}
-      <ul className={s.list}>
-        {contacts.map(({ id, name, number }) => (
-          <li key={id} className={s.item}>
-            <span className={s.name}>{name}: </span>
-            <span className={s.number}>{number}</span>
-            <button
-              type="button"
-              className={s.button}
-              onClick={() => dispatch(contactsOperations.deleteContact(id))}
-            >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
+      {contacts.length > 0 && (
+        <ul className={s.list}>
+          {contacts.map(({ id, name, number }) => (
+            <li key={id} className={s.item}>
+              <span className={s.name}>{name}: </span>
+              <span className={s.number}>{number}</span>
+              <button
+                type="button"
+                className={s.button}
+                onClick={() => dispatch(deleteContact(id))}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 };
