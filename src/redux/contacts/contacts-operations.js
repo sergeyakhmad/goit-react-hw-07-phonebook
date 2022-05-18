@@ -15,9 +15,13 @@ export const fetchContacts = createAsyncThunk(
 
 export const addContact = createAsyncThunk(
   'contacts/addContacts',
-  async ({ name, number }) => {
-    const contact = await contactsAPI.addContact({ name, number });
-    return contact;
+  async ({ name, number }, { rejectWithValue }) => {
+    try {
+      const contact = await contactsAPI.addContact({ name, number });
+      return contact;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   }
 );
 
